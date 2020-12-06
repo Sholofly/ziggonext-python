@@ -130,6 +130,8 @@ class ZiggoNextBox:
         uiStatus = statusPayload["uiStatus"]
         if uiStatus == "mainUI":
             playerState = statusPayload["playerState"]
+            if not "sourceType" in playerState:
+                return
             sourceType = playerState["sourceType"]
             stateSource = playerState["source"]
             speed = playerState["speed"]

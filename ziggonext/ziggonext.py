@@ -42,7 +42,6 @@ def _makeId(stringLength=10):
     letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     return "".join(random.choice(letters) for i in range(stringLength))
 
-
 class ZiggoNext:
     """Main class for handling connections with Ziggo Next Settop boxes."""
     logger: Logger
@@ -77,8 +76,14 @@ class ZiggoNext:
                 raise ZiggoNextAuthenticationError("Invalid credentials")
             raise ZiggoNextConnectionError("Authentication error: " + status)
 
-
     def get_session(self):
+        """Get Ziggo Next Session information"""
+        if self._country_code in ["be-nl", "be-fr"]:
+            self.get_be_session()
+        else:
+            self.get_default_session()
+
+    def get_default_session(self):
         """Get Ziggo Next Session information"""
         payload = {"username": self.username, "password": self.password}
         try:
@@ -176,10 +181,7 @@ class ZiggoNext:
 
     def get_session_and_token(self):
         """Get session and token from Ziggo Next"""
-        if self._country_code in ["be-nl", "be-fr"]:
-            self.get_be_session()
-        else:
-            self.get_session()
+        self.get_session()
         self._get_token()
 
     def _register_settop_boxes(self):

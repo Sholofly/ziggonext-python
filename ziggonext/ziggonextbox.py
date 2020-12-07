@@ -182,20 +182,21 @@ class ZiggoNextBox:
                 self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
                 channelId = stateSource["channelId"]
                 eventId = stateSource["eventId"]
-                channel = self.channels[channelId]
-                listing = self._get_listing(eventId)
-                self.info.setChannel(channelId)
-                self.info.setChannelTitle(channel.title)
-                self.info.setTitle(self._get_listing_title(listing))
-                self.info.setImage(channel.streamImage)
-                self.info.setPaused(False)
+                if channelId is not None:
+                    channel = self.channels[channelId]
+                    listing = self._get_listing(eventId)
+                    self.info.setChannel(channelId)
+                    self.info.setChannelTitle(channel.title)
+                    self.info.setTitle(self._get_listing_title(listing))
+                    self.info.setImage(channel.streamImage)
+                    self.info.setPaused(False)
             elif playerState["sourceType"] == BOX_PLAY_STATE_VOD:
                 self.info.setSourceType(BOX_PLAY_STATE_VOD)
                 title_id = stateSource["titleId"]
                 mediagroup_content = self._get_mediagroup(title_id)
                 self.info.setChannel(None)
                 self.info.setChannelTitle("VOD")
-                self.info.setTitle(mediagroup_content["title"])
+                self.info.setTitle(self._get_mediagroup_title(mediagroup_content))
                 self.info.setImage(self._get_mediagroup_image(mediagroup_content))
                 self.info.setPaused(speed == 0)
             else:
@@ -225,7 +226,6 @@ class ZiggoNextBox:
         if listing_content is None:
             return ""
         return listing_content["program"]["title"]
-
     
     def _get_listing_image(self, listing_content):
         """Get listing image."""
@@ -246,9 +246,18 @@ class ZiggoNextBox:
         if response.status_code == 200:
             return response.json()
         return None
+
+    def _get_mediagroup_title(self, mediagroup_content):
+        if mediagroup_content is None:
+            return "Video on demand"
+        else:
+            return mediagroup_content["title"]
     
     def _get_mediagroup_image(self, mediagroup_content):
-        return mediagroup_content["images"][0]["url"]
+        if mediagroup_content is None:
+            return None
+        else:
+            return mediagroup_content["images"][0]["url"]
     
     def send_key_to_box(self,key: str):
         """Sends emulated (remote) key press to settopbox"""

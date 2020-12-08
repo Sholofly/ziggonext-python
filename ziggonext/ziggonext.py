@@ -412,7 +412,14 @@ class ZiggoNext:
         return results
 
     def _get_single_recording(self, payload):
-        recording = ZiggoRecordingSingle(payload["recordingId"], payload["title"], payload["images"][0]["url"])
+        self.logger.debug("Single Recording Payload:")
+        self.logger.debug(payload)
+
+        image = None
+        if len(payload["images"]) > 0:
+            image = payload["images"][0]["url"]
+
+        recording = ZiggoRecordingSingle(payload["recordingId"], payload["title"], image)
         if "seasonNumber" in payload:
             recording.set_season(payload["seasonNumber"])
         else:

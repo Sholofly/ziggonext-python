@@ -179,17 +179,18 @@ class ZiggoNextBox:
                 self.info.setImage(channel.streamImage)
                 self.info.setPaused(speed == 0)
             elif playerState["sourceType"] == BOX_PLAY_STATE_CHANNEL:
-                self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
-                channelId = stateSource["channelId"]
-                eventId = stateSource["eventId"]
-                if channelId is not None:
-                    channel = self.channels[channelId]
-                    listing = self._get_listing(eventId)
-                    self.info.setChannel(channelId)
-                    self.info.setChannelTitle(channel.title)
-                    self.info.setTitle(self._get_listing_title(listing))
-                    self.info.setImage(channel.streamImage)
-                    self.info.setPaused(False)
+                if stateSource is not None:
+                    self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
+                    channelId = stateSource["channelId"]
+                    eventId = stateSource["eventId"]
+                    if channelId is not None:
+                        channel = self.channels[channelId]
+                        listing = self._get_listing(eventId)
+                        self.info.setChannel(channelId)
+                        self.info.setChannelTitle(channel.title)
+                        self.info.setTitle(self._get_listing_title(listing))
+                        self.info.setImage(channel.streamImage)
+                        self.info.setPaused(False)
             elif playerState["sourceType"] == BOX_PLAY_STATE_VOD:
                 self.info.setSourceType(BOX_PLAY_STATE_VOD)
                 title_id = stateSource["titleId"]

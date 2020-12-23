@@ -183,7 +183,7 @@ class ZiggoNextBox:
                     self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
                     channelId = stateSource["channelId"]
                     eventId = stateSource["eventId"]
-                    if channelId is not None:
+                    if channelId is not None and channelId in self.channels.keys():
                         channel = self.channels[channelId]
                         listing = self._get_listing(eventId)
                         self.info.setChannel(channelId)
@@ -191,6 +191,10 @@ class ZiggoNextBox:
                         self.info.setTitle(self._get_listing_title(listing))
                         self.info.setImage(channel.streamImage)
                         self.info.setPaused(False)
+                    else:
+                        self._set_unknown_channel_info()
+                        self.info.setPaused(speed == 0)
+
             elif playerState["sourceType"] == BOX_PLAY_STATE_VOD:
                 self.info.setSourceType(BOX_PLAY_STATE_VOD)
                 title_id = stateSource["titleId"]
@@ -201,11 +205,7 @@ class ZiggoNextBox:
                 self.info.setImage(self._get_mediagroup_image(mediagroup_content))
                 self.info.setPaused(speed == 0)
             else:
-                self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
-                eventId = stateSource["eventId"]
-                self.info.setChannel(None)
-                self.info.setTitle("Playing something...")
-                self.info.setImage(None)
+                self._set_unknown_channel_info()
                 self.info.setPaused(speed == 0)
         elif uiStatus == "apps":
             appsState = statusPayload["appsState"]
@@ -222,6 +222,12 @@ class ZiggoNextBox:
         if self._change_callback:
             self._change_callback()
     
+    def _set_unknown_channel_info(self):
+        self.info.setSourceType(BOX_PLAY_STATE_CHANNEL)
+        self.info.setChannel(None)
+        self.info.setTitle("No information available")
+        self.info.setImage(None)
+
     def _get_listing_title(self, listing_content):
         """Get listing title."""
         if listing_content is None:
